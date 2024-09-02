@@ -48,6 +48,7 @@ def update_angle_label(angle):
     else:
         angle_label.config(text="Ângulo Atual: N/A")
 
+'''
 def turn_off():
     """Envia um comando para desligar o dispositivo."""
     try:
@@ -66,6 +67,7 @@ def turn_off():
         
     except serial.SerialException as e:
         messagebox.showerror("Erro", f"Erro ao enviar comando OFF: {e}")
+'''
 
 def exit_app():
     """Fecha a aplicação e a porta serial."""
@@ -95,8 +97,10 @@ send_button = tk.Button(root, text="Enviar", command=validate_and_send_data, bg=
 send_button.pack(pady=10)
 
 # Cria um botão para desligar o dispositivo
+'''
 off_button = tk.Button(root, text="OFF", command=turn_off, bg='red', fg='white')
 off_button.pack(pady=5)
+'''
 
 # Cria um botão para sair da aplicação
 exit_button = tk.Button(root, text="EXIT", command=exit_app, bg='white', fg='black')
