@@ -8,7 +8,7 @@
 #define COOLER_CHANNEL    LEDC_CHANNEL_0
 #define COOLER_TIMER      LEDC_TIMER_0
 #define COOLER_DUTY_RES   LEDC_TIMER_8_BIT  // Resolução de 8 bits
-#define COOLER_FREQUENCY  10000              // Frequência de 10 kHz para PWM
+#define COOLER_FREQUENCY  10000               // Frequência de 10 kHz para PWM
 #define COOLER_PIN        22                 // Pino GPIO conectado ao cooler
 #define BUF_SIZE          1024               // Tamanho do buffer para leitura UART
 #define DUTY_STR_SIZE     50                 // Tamanho do buffer para a string de duty cycle
@@ -48,31 +48,31 @@ void increase_and_stabilize_duty_cycle(int stabilize, int delay_ms)
     ledc_update_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL);
 }
 
-void exception_for_duty_10()
-{
-    // Vai para 255 e espera 5 segundos
-    ledc_set_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL, 255);
-    ledc_update_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL);
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-   // send_serial_data("Duty cycle 255\n");
+// void exception_for_duty_10()
+// {
+//     // Vai para 255 e espera 5 segundos
+//     ledc_set_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL, 255);
+//     ledc_update_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL);
+//     vTaskDelay(5000 / portTICK_PERIOD_MS);
+//     send_serial_data("Duty cycle 255\n");
 
-    // Cai para 155 e espera 5 segundos
-    ledc_set_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL, 155);
-    ledc_update_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL);
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-  //  send_serial_data("Duty cycle 155\n");
+//     // Cai para 155 e espera 5 segundos
+//     ledc_set_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL, 155);
+//     ledc_update_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL);
+//     vTaskDelay(5000 / portTICK_PERIOD_MS);
+//     send_serial_data("Duty cycle 155\n");
 
-    // Cai para 130 e espera 5 segundos
-    ledc_set_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL, 130);
-    ledc_update_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL);
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-   // send_serial_data("Duty cycle 130\n");
+//     // Cai para 130 e espera 5 segundos
+//     ledc_set_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL, 130);
+//     ledc_update_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL);
+//     vTaskDelay(5000 / portTICK_PERIOD_MS);
+//     send_serial_data("Duty cycle 130\n");
 
-    // Cai para 110 e estabiliza
-    ledc_set_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL, 110);
-    ledc_update_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL);
-   // send_serial_data("Duty cycle 110\n");
-}
+//     // Cai para 110 e estabiliza
+//     ledc_set_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL, 110);
+//     ledc_update_duty(LEDC_LOW_SPEED_MODE, COOLER_CHANNEL);
+//     send_serial_data("Duty cycle 110\n");
+// }
 
 void app_main(void)
 {
@@ -100,7 +100,6 @@ void app_main(void)
     int last_duty = 0;
     int now_duty = 0;
     char data[BUF_SIZE];
-    char stored_data[BUF_SIZE] = ""; // Buffer para armazenar os dados recebidos
 
     while (1) {
         // Lê dados da serial
@@ -108,13 +107,6 @@ void app_main(void)
         if (length > 0) {
             data[length] = '\0'; // Adiciona o caractere de terminação
             printf("Valor recebido: %s\n", data); // Exibe o valor recebido
-
-            strncat(stored_data, data, length);
-
-            // Verifica se foi solicitado imprimir os dados armazenados
-            if (strcmp(data, "print") == 0) {
-                printf("Dados armazenados: %s\n", stored_data);
-            }
 
             // Converte o valor recebido de string para inteiro
             now_duty = atoi(data);
@@ -124,32 +116,51 @@ void app_main(void)
             if (now_duty > 255) now_duty = 255;
 
             // Executa ações baseadas no valor recebido
-            if (now_duty == 10) {
-                exception_for_duty_10();
-                last_duty = 110; // Mantém o último valor válido após a exceção
-            } else if (now_duty == 45) {
-                increase_and_stabilize_duty_cycle(140, 5000);
-                last_duty = 140;
-            } else if (now_duty == 60) {
-                increase_and_stabilize_duty_cycle(160, 5000);
-                last_duty = 160;
-            } else if (now_duty == 80) {
+            if (now_duty == 30) {
+                //exception_for_duty_10();
+                increase_and_stabilize_duty_cycle(30,1000);
+                last_duty = 30; // Mantém o último valor válido após a exceção
+            }else if (now_duty == 55) {
+                increase_and_stabilize_duty_cycle(70, 1000);
+                last_duty = 70;
+            }else if (now_duty == 65) {
+                increase_and_stabilize_duty_cycle(90, 1000);
+                last_duty = 90;
+            }else if (now_duty == 70) {
+                increase_and_stabilize_duty_cycle(110, 1000);
+                last_duty = 110;
+            }else if (now_duty == 75) {
+                increase_and_stabilize_duty_cycle(145, 1000);
+                last_duty = 145;
+            }else if (now_duty == 80) {
                 increase_and_stabilize_duty_cycle(255, 0); // Permanece em 255
                 last_duty = 255;
             } else if(now_duty == 0){
-                increase_and_stabilize_duty_cycle(0,5000);//botao off e não sei fazer o botão on uma vez que o pwm inicializa em duty =0?
+                increase_and_stabilize_duty_cycle(0,1000);//botao off e não sei fazer o botão on uma vez que o pwm inicializa em duty =0?
             } else {
                 send_serial_data("Valor não permitido\n");
                 now_duty = last_duty; // Mantém o último valor válido
             }
         } else {
             // Se a serial está vazia, usa o último duty cycle válido
-            if (last_duty == 110) {
+            if (last_duty == 30) {
+                now_duty = 30;
+            } else if (last_duty == 70) {
+                now_duty = 70;
+            } else if (last_duty == 80) {
+                now_duty = 80;
+            } else if (last_duty == 90) {
+                now_duty = 90;
+            } else if (last_duty == 100) {
+                now_duty = 100;
+            } else if (last_duty == 110) {
                 now_duty = 110;
-            } else if (last_duty == 140) {
-                now_duty = 140;
-            } else if (last_duty == 160) {
-                now_duty = 160;
+            } else if (last_duty == 120) {
+                now_duty = 120;
+            } else if (last_duty == 145) {
+                now_duty = 145;
+            } else if (last_duty == 180) {
+                now_duty = 180;
             } else if (last_duty == 255) {
                 now_duty = 255;
             }

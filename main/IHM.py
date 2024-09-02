@@ -24,7 +24,7 @@ except serial.SerialException as e:
 def validate_and_send_data():
     """Valida a entrada para ser um dos valores permitidos e envia para o ESP32."""
     data = entry.get()  # Obtém o texto do campo de entrada
-    if data in {'10', '45', '60', '80'}:
+    if data in {'30','55', '65', '70', '75', '80'}:
         try:
             ser.write(data.encode())  # Converte string para bytes e envia
             update_angle_label(data)  # Atualiza o rótulo de ângulo com o valor enviado
@@ -38,36 +38,23 @@ def validate_and_send_data():
         except serial.SerialException as e:
             messagebox.showerror("Erro", f"Erro ao enviar dados: {e}")
     else:
-        messagebox.showwarning("Warning", "Por favor, insira um valor válido (10, 45, 60, 80).")
+        messagebox.showwarning("Warning", "Por favor, insira um valor válido (30...80 em 5 em 5 graus).")
 
 def update_angle_label(angle):
     """Atualiza o rótulo de ângulo atual com o valor recebido."""
     angle_value = int(angle)
-    if angle_value in {10, 45, 60, 80}:
+    if angle_value in {30, 55, 65, 70, 75, 80}:
         angle_label.config(text=f"Ângulo Atual: {angle_value}°")
     else:
         angle_label.config(text="Ângulo Atual: N/A")
 
-'''
 def turn_off():
     """Envia um comando para desligar o dispositivo."""
     try:
-        angle_zero = '0'
-        ser.write(angle_zero.encode())  # Converte string para bytes e envia
-        angle_label.config(text=f"Ângulo Atual: {int(angle_zero)}°")
-        response = ser.readline().decode('utf-8').strip() # Aguarda uma resposta do ESP32
-        if response:
-            print(f"Resposta recebida: {response}")  # Para depuração
-        else:
-            messagebox.showinfo("Info", f"Mensagem enviada: {angle_zero}\nSem resposta do ESP32")
-        entry.delete(0, tk.END)  # Limpa o campo de entrada
-    except serial.SerialException as e:
-        messagebox.showerror("Erro", f"Erro ao enviar dados: {e}")
-    
-        
+        ser.write(b'OFF')
+        messagebox.showinfo("Info", "Comando OFF enviado")
     except serial.SerialException as e:
         messagebox.showerror("Erro", f"Erro ao enviar comando OFF: {e}")
-'''
 
 def exit_app():
     """Fecha a aplicação e a porta serial."""
@@ -97,10 +84,8 @@ send_button = tk.Button(root, text="Enviar", command=validate_and_send_data, bg=
 send_button.pack(pady=10)
 
 # Cria um botão para desligar o dispositivo
-'''
 off_button = tk.Button(root, text="OFF", command=turn_off, bg='red', fg='white')
 off_button.pack(pady=5)
-'''
 
 # Cria um botão para sair da aplicação
 exit_button = tk.Button(root, text="EXIT", command=exit_app, bg='white', fg='black')
